@@ -1,0 +1,32 @@
+(let ((current 50) (zeros 0) (in (open ".\\aoc01a.txt" :if-does-not-exist nil)))
+    (when in
+        (loop for line = (read-line in nil)
+            while line do (let ((change (mod (parse-integer (subseq line 1)) 100)))
+                (if (char= #\R (char line 0))
+                    (progn
+                        (setf current (mod (+ current change) 100))
+                        (if (= current 0) (setf zeros (+ zeros 1))))
+                    (progn
+                        (setf current (- current (mod change 100)))
+                        (if (< current 0) (setf current (+ 100 current)))
+                        (if (= current 0) (setf zeros (+ zeros 1)))))))
+        (close in)
+        (format t "Zeros ~a~%" zeros)))
+
+(let ((current 50) (zeros 0) (in (open "aoc01a.txt" :if-does-not-exist nil)))
+    (when in
+        (loop for line = (read-line in nil)
+            while line do (let ((change (parse-integer (subseq line 1))))
+                (multiple-value-bind (z c) (floor change 100)
+                    (setf zeros (+ zeros z))
+                    (let ((next current))
+                        (if (char= #\R (char line 0))
+                            (setf next (+ next c))
+                            (setf next (- next c)))
+                        (if (= next 0)
+                            (setf zeros (+ zeros 1)))
+                        (if (or (and (/= current 0) (< next 0)) (> next 99))
+                            (setf zeros (+ zeros 1)))
+                        (setf current (mod next 100))))))
+        (close in)
+        (format t "Zeros ~a~%" zeros)))
