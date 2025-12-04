@@ -17,20 +17,14 @@
     (let* ((pfx (build-prefix str len)) (sfx-idx (+ (- (length str) len) (length pfx))))
         (concatenate 'string pfx (subseq str sfx-idx))))
 
-; Part one
-(with-open-file (in "aoc03.txt" :direction :input)
-    (when in
-        (let ((total 0))
-            (loop for line = (read-line in nil :eof)
-                until (eq line :eof) do
-                    (incf total (parse-integer (build-num line 2))))
-            (format t "Total: ~a~%" total))))
+(defun pick-batteries (filename len)
+    (with-open-file (in filename :direction :input)
+        (when in
+            (let ((total 0))
+                (loop for line = (read-line in nil :eof)
+                    until (eq line :eof) do
+                        (incf total (parse-integer (build-num line len))))
+                (format t "Total [~a]: ~a~%" len total)))))
 
-;Part two
-(with-open-file (in "aoc03.txt" :direction :input)
-    (when in
-        (let ((total 0))
-            (loop for line = (read-line in nil :eof)
-                until (eq line :eof) do
-                    (incf total (parse-integer (build-num line 12))))
-            (format t "Total: ~a~%" total))))
+(pick-batteries "aoc03.txt" 2)
+(pick-batteries "aoc03.txt" 12)
