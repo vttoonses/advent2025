@@ -1,27 +1,3 @@
-; Part one
-(defun pick-batteries (current bank)
-    (if (= (length bank) 0)
-        current
-        (let* (
-            (cur-str (format nil "~a" current))
-            (digit (subseq bank 0 1))
-            (tens (subseq cur-str 0 1))
-            (ones (subseq cur-str 1))
-            (test-1 (concatenate 'string tens digit))
-            (test-2 (concatenate 'string ones digit)))
-                (pick-batteries (max (parse-integer test-1) (parse-integer test-2) current) (subseq bank 1)))))
-
-(with-open-file (in "aoc03.txt" :direction :input)
-    (when in
-        (let ((total 0))
-            (loop for line = (read-line in nil :eof)
-                until (eq line :eof) do
-                    (let ((current (parse-integer (subseq line 0 2))))
-                        (incf total (pick-batteries current (subseq line 2)))))
-            (format t "Total: ~a~%" total))))
-
-
-; Part two
 (defun find-first-largest (str start end)
     (let ((largest start))
         (loop for lcv from start to end do
@@ -41,6 +17,16 @@
     (let* ((pfx (build-prefix str len)) (sfx-idx (+ (- (length str) len) (length pfx))))
         (concatenate 'string pfx (subseq str sfx-idx))))
 
+; Part one
+(with-open-file (in "aoc03.txt" :direction :input)
+    (when in
+        (let ((total 0))
+            (loop for line = (read-line in nil :eof)
+                until (eq line :eof) do
+                    (incf total (parse-integer (build-num line 2))))
+            (format t "Total: ~a~%" total))))
+
+;Part two
 (with-open-file (in "aoc03.txt" :direction :input)
     (when in
         (let ((total 0))
