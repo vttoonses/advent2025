@@ -1,3 +1,4 @@
+; Part one
 (defun pick-batteries (current bank)
     (if (= (length bank) 0)
         current
@@ -29,14 +30,21 @@
         largest))
 
 (defun build-prefix (str len)
-    (format t "~a -- ~a~%" len str)
-    (let ((end (- (length str) len)))
-        (format t "end ~a~%" end)
-        (if (= end 0) ""
-            (let ((idx (find-first-largest str 0 end)))
-                (concatenate 'string (string (char str idx)) (build-prefix (subseq str (+ idx 1)) len))))))
+    (if (= len 0)
+        ""
+        (let ((end (- (length str) len)))
+            (if (= end 0) ""
+                (let ((idx (find-first-largest str 0 end)))
+                    (concatenate 'string (string (char str idx)) (build-prefix (subseq str (+ idx 1)) (- len 1))))))))
 
 (defun build-num (str len)
     (let* ((pfx (build-prefix str len)) (sfx-idx (+ (- (length str) len) (length pfx))))
-        (format t "~a -- ~a~%" pfx sfx-idx)
         (concatenate 'string pfx (subseq str sfx-idx))))
+
+(with-open-file (in "aoc03.txt" :direction :input)
+    (when in
+        (let ((total 0))
+            (loop for line = (read-line in nil :eof)
+                until (eq line :eof) do
+                    (incf total (parse-integer (build-num line 12))))
+            (format t "Total: ~a~%" total))))
