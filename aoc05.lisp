@@ -6,7 +6,7 @@
         :while end))
 
 (defun check-freshness (id ranges)
-  (if (null ranges) nil
+  (if ranges
     (let* ((range (first ranges)) (low (parse-integer (first range))) (high (parse-integer (second range))))
       (if (and (>= id low) (<= id high)) t (check-freshness id (cdr ranges))))))
 
@@ -29,20 +29,23 @@
         (if (>= r1l r2l) (list (+ r2h 1) r1h) (list r1l (- r2l 1)))))))
 
 (defun rip-it (range ranges)
-  (if (null ranges) range
+  (if ranges
     (let ((result (remove-overlap range (first ranges))))
-      (if (null result) nil (rip-it result (rest ranges))))))
+      (if (null result) nil (rip-it result (rest ranges))))
+    range))
       
 (defun remove-overlaps (range ranges)
-  (if (null ranges) (list range)
+  (if ranges
     (let ((clean-range (rip-it range ranges)))
       (if (null clean-range) (remove-overlaps (first ranges) (rest ranges))
-        (cons clean-range (remove-overlaps (first ranges) (rest ranges)))))))
+        (cons clean-range (remove-overlaps (first ranges) (rest ranges)))))
+    (list range)))
 
 (defun count-possible-ingredients (ranges)
-  (if (null ranges) 0
+  (if ranges
     (let* ((cur (first ranges)) (low (first cur)) (high (second cur)))
-      (+ (+ (- high low) 1) (count-possible-ingredients (rest ranges))))))
+      (+ (+ (- high low) 1) (count-possible-ingredients (rest ranges))))
+    0))
 
 (defun count-possible-fresh-ingredients (filename)
   (let ((ranges '()))
