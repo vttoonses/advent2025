@@ -36,7 +36,6 @@
 (defun distances (jboxes)
   (let ((circuits '()))
     (loop for lcv from 0 below (1- (length jboxes)) do
-      (if (zerop (mod lcv 10)) (format t "Lcv ~a~%" lcv))
       (let ((start (nth lcv jboxes)) (other-boxes (subseq jboxes (1+ lcv))))
         (loop for lcv2 from 0 below (length other-boxes) do
           (let ((end (nth lcv2 other-boxes)))
@@ -44,11 +43,8 @@
     (sort circuits #'< :key #'car)))
 
 (defun day08 (filename cycles connections)
-  (format t "Reading file and getting distances ... ~%")
   (let* ((jboxes (read-jboxes filename)) (shortest (distances jboxes)) (circuits '()))
-    (format t "Getting ~a connections~%" cycles)
-    (setf shortest (subseq shortest 0 cycles))
-    (format t "Building circuit connections ...~%")
+    (if (not (zerop cycles)) (setf shortest (subseq shortest 0 cycles)))
     (dolist (delta-circuit shortest) do
       (let* ((circuit (cdr delta-circuit))
              (possibles (find-circuits circuit circuits))
@@ -64,5 +60,24 @@
                 (progn
                   (setf (nth p1 circuits) (append (nth p1 circuits) (nth p2 circuits)))
                   (setf circuits (remove (nth p2 circuits) circuits)))))))))
-    (format t "Post-processing ...~%")
     (reduce #'* (subseq (sort (mapcar #'length circuits) #'>) 0 connections))))
+
+(defun day08p2 (filename)
+  (let* ((jboxes (read-jboxes filename)) (c (length jboxes)) (shortest (distances jboxes)) (circuits '()))
+    (dolist (delta-circuit shortest) do
+      (let* ((circuit (cdr delta-circuit))
+             (possibles (find-circuits circuit circuits))
+             (p1 (cdr (car possibles)))
+             (p2 (cdr (cadr possibles))))
+        (if (and (null p1) (null p2))
+          (setf circuits (append circuits (list circuit)))
+          (if (and (not (null p1)) (null p2))
+            (setf (nth p1 circuits) (append (nth p1 circuits) (cdr circuit)))
+            (if (and (null p1) (not (null p2)))
+              (setf (nth p2 circuits) (append (nth p2 circuits) (list (car circuit))))
+              (if (and (not (null p1)) (/= p1 p2))
+                (progn
+                  (setf (nth p1 circuits) (append (nth p1 circuits) (nth p2 circuits)))
+                  (setf circuits (remove (nth p2 circuits) circuits)))))))
+        (if (or (and p1 (= (length (nth p1 circuits)) c)) (and p2 (= (length (nth p2 circuits)) c)))
+          (let ((x1 (caar circuit)) (x2 (caadr circuit))) (format t "~a * ~a = ~a~%" x1 x2 (* x1 x2)) (return-from day08p2)))))))
