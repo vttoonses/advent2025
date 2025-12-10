@@ -64,9 +64,8 @@
 (defun part2 (filename)
   (flet ((area (s1 s2) (* (1+ (abs (- (x s1) (x s2)))) (1+ (abs (- (y s1) (y s2)))))))
     (let* ((squares (read-squares filename)) (largest 112592935) (bounds (define-boundaries squares)) (row-bounds (row-boundaries bounds)))
-;      (loop for lcv from 0 below (- (length squares) 2) do
       (loop for lcv from 0 below (1- (length squares)) do
         (loop for lcv2 from (1+ lcv) below (length squares) do
           (let* ((p1 (nth lcv squares)) (p2 (nth lcv2 squares)) (rect (rect-boundaries p1 p2)) (tmp (area p1 p2)))
             (if (and (> tmp largest) (rect-inside-p rect row-bounds)) (format t "LARGEST: ~a~%" (setf largest (max largest tmp))))))
-      largest)))
+      largest))))
